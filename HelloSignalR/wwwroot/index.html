@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-2.1.4.js" type="text/javascript"></script>
+    <script src="Scripts/jquery.signalR-2.2.0.js" type="text/javascript"></script>
+    <link href="styles/sample.css" rel="stylesheet" />
+    <title>ASOS SignalR Sample</title>
+    <script type="text/javascript">
+        'use strict';
+        $(document).ready(function () {
+            let connectionPath = "http://localhost:5000/signalr";
+
+            let connection = $.connection(connectionPath);
+            let log = data => console.log(data);
+
+
+            connection.received(data => {
+                log(`From server: ${data}`);
+            });
+
+            connection.stateChanged(function (change) {
+                switch (change.newState) {
+                    case $.signalR.connectionState.reconnecting:
+                        log('Re-connecting');
+                        break;
+                    case $.signalR.connectionState.connected:
+                        log(`Connected to ${connection.url}`);
+                        break;
+                    case $.signalR.connectionState.disconnected:
+                        log("Disconnected");
+                        break;
+                }
+            });
+
+            connection.start().done(() => {
+                connection.send("Test message");
+            });
+
+            setTimeout(() => connection.stop(), 2000);
+        });
+    </script>
+</head>
+<body>
+    <h1>AspNet.Security.OpenIdConnect.Server SignalR Sample</h1>
+    <div>To open console press <code>Ctrl + Shift + I</code> / <code>Cmd + Shift + I</code> / <code>F12</code> and choose <code>Console</code> tab</div>
+</body>
+</html>
