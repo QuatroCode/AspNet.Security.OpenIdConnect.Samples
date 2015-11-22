@@ -18,12 +18,18 @@ namespace HelloSignalR
             // Add the platform handler to the request pipeline.
             app.UseIISPlatformHandler();
 
+            if (env.IsDevelopment())
+            {
+                // In case any errors occur.
+                app.UseDeveloperExceptionPage();
+            }
+
             // Add WebSockets handling for SignalR to support it.
             app.UseWebSockets();
 
             app.UseSignalR<SimpleConnection>("/signalr");
 
-            // Configure the HTTP request pipeline.
+            // Configure the HTTP request pipeline for our front-end files.
             app.UseDefaultFiles();
             app.UseStaticFiles();
         }
