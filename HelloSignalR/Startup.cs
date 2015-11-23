@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNet.Hosting;
 using HelloSignalR.Connections;
 using Microsoft.Extensions.Logging;
+using HelloSignalR.Providers;
 
 namespace HelloSignalR
 {
@@ -12,6 +13,7 @@ namespace HelloSignalR
         {
             services.AddAuthentication();
             services.AddSignalR();
+            services.AddCaching();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, ILogger<Startup> logger)
@@ -33,6 +35,18 @@ namespace HelloSignalR
             }
 
             logger.LogInformation($"Environment: {env.EnvironmentName}");
+
+            // Add token issuing middleware.
+            app.UseOpenIdConnectServer(config =>
+            {
+                config.Provider = new AuthenticationProvider();
+
+                if (env.IsDevelopment())
+                {
+                    config.ApplicationCanDisplayErrors = true;
+                    config.AllowInsecureHttp = true;
+                }
+            });
 
             // Add WebSockets handling for SignalR to support it.
             app.UseWebSockets();
