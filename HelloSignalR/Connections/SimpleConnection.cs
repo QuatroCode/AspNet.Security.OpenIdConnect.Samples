@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
+using Microsoft.Extensions.Logging;
 
 namespace HelloSignalR.Connections
 {
@@ -10,7 +11,9 @@ namespace HelloSignalR.Connections
         {
             await base.OnConnected(request, connectionId);
             var identity = request.HttpContext.User.Identity;
-            await Connection.Send(connectionId, $"Connection is {(identity.IsAuthenticated ? "authenticated" : "unauthenticated")}");
+            var authenticatedOrNot = (identity.IsAuthenticated ? "Authenticated" : "Unauthenticated");
+            Logger.LogInformation($"{authenticatedOrNot} connection {connectionId} has just connected.");
+            await Connection.Send(connectionId, $"Connection is {authenticatedOrNot}");
             if (identity.IsAuthenticated)
             {
                 await Connection.Send(connectionId, $"Authenticated username: ${identity.Name}");

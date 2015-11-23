@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNet.Hosting;
 using HelloSignalR.Connections;
+using Microsoft.Extensions.Logging;
 
 namespace HelloSignalR
 {
@@ -13,7 +14,7 @@ namespace HelloSignalR
             services.AddSignalR();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, ILogger<Startup> logger)
         {
             // Add the platform handler to the request pipeline.
             app.UseIISPlatformHandler();
@@ -22,7 +23,16 @@ namespace HelloSignalR
             {
                 // In case any errors occur.
                 app.UseDeveloperExceptionPage();
+
+                if (env.IsDevelopment())
+                {
+                    loggerFactory.MinimumLevel = LogLevel.Information;
+                    loggerFactory.AddConsole();
+                    loggerFactory.AddDebug();
+                }
             }
+
+            logger.LogInformation($"Environment: {env.EnvironmentName}");
 
             // Add WebSockets handling for SignalR to support it.
             app.UseWebSockets();
