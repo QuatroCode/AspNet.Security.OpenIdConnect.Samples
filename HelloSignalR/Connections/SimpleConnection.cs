@@ -16,7 +16,7 @@ namespace HelloSignalR.Connections
             await Connection.Send(connectionId, $"Connection is {authenticatedOrNot}");
             if (identity.IsAuthenticated)
             {
-                await Connection.Send(connectionId, $"Authenticated username: ${identity.Name}");
+                await Connection.Send(connectionId, $"Authenticated username: {identity.Name}");
             }
         }
         protected override async Task OnReceived(HttpRequest request, string connectionId, string data)
