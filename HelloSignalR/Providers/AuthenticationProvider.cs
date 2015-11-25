@@ -10,7 +10,14 @@ namespace HelloSignalR.Providers
     {
         public override Task ValidateClientAuthentication(ValidateClientAuthenticationContext context)
         {
-            context.Skipped();
+            if (context.ClientId == "AspNetContribSample")
+            {
+                context.Validated();
+            }
+            else
+            {
+                context.Rejected();
+            }
             return Task.FromResult(0);
         }
         public override Task GrantResourceOwnerCredentials(GrantResourceOwnerCredentialsContext context)
