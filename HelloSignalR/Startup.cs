@@ -8,6 +8,7 @@ using Microsoft.AspNet.Http;
 using System;
 using Microsoft.AspNet.Authentication.JwtBearer;
 using System.Threading.Tasks;
+using Microsoft.Net.Http.Headers;
 
 namespace HelloSignalR
 {
@@ -30,15 +31,10 @@ namespace HelloSignalR
                 // In case any errors occur.
                 app.UseDeveloperExceptionPage();
 
-                if (env.IsDevelopment())
-                {
-                    loggerFactory.MinimumLevel = LogLevel.Information;
-                    loggerFactory.AddConsole();
-                    loggerFactory.AddDebug();
-                }
+                loggerFactory.MinimumLevel = LogLevel.Information;
+                loggerFactory.AddConsole();
+                loggerFactory.AddDebug();
             }
-
-            logger.LogInformation($"Environment: {env.EnvironmentName}");
 
             var hostname = "http://localhost:5000/";
 
@@ -48,13 +44,6 @@ namespace HelloSignalR
                 // Your Auhentication server.
                 config.Provider = new AuthenticationProvider();
                 config.Issuer = new Uri(hostname);
-
-                if (env.IsDevelopment())
-                {
-                    // For not requiring HTTPS in localhost.
-                    config.AllowInsecureHttp = true;
-                    config.ApplicationCanDisplayErrors = true;
-                }
             });
 
             app.UseJwtBearerAuthentication(options =>
@@ -76,28 +65,7 @@ namespace HelloSignalR
                     // Which can be as easy as adding it to query string
                     OnReceivingToken = context =>
                     {
-                        string token = null;
-                        // TODO: Maybe these constants are defined somewhere in framework already?
-                        const string AuthorizationKey = "Authorization";
-                        const string BearerKey = "Bearer";
-
-                        // First, try to extract token from 'Authorization: Bearer {token}' header
-                        if (context.Request.Headers.ContainsKey(AuthorizationKey))
-                        {
-                            var bearer = context.Request.Headers[AuthorizationKey].ToString();
-
-                            var start = $"{BearerKey} ";
-                            if (bearer.StartsWith(start) && bearer.Length > start.Length)
-                            {
-                                token = bearer.Substring(start.Length);
-                            }
-                        }
-
                         // If the token is not there, look at '?token={token}' query string value
-                        token = token ?? context.Request.Query["token"];
-
-                        // Whichever was found, assign it to the context
-                        context.Token = token;
                         return Task.FromResult(true);
                     }
                 };

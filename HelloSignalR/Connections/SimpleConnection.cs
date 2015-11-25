@@ -9,11 +9,10 @@ namespace HelloSignalR.Connections
     {
         protected override async Task OnConnected(HttpRequest request, string connectionId)
         {
-            await base.OnConnected(request, connectionId);
             var identity = request.HttpContext.User.Identity;
-            var authenticatedOrNot = (identity.IsAuthenticated ? "Authenticated" : "Unauthenticated");
-            Logger.LogInformation($"{authenticatedOrNot} connection {connectionId} has just connected.");
-            await Connection.Send(connectionId, $"Connection is {authenticatedOrNot}");
+            var status = (identity.IsAuthenticated ? "Authenticated" : "Unauthenticated");
+            Logger.LogInformation($"{status} connection {connectionId} has just connected.");
+            await Connection.Send(connectionId, $"Connection is {status}");
             if (identity.IsAuthenticated)
             {
                 await Connection.Send(connectionId, $"Authenticated username: {identity.Name}");
@@ -22,9 +21,9 @@ namespace HelloSignalR.Connections
         protected override async Task OnReceived(HttpRequest request, string connectionId, string data)
         {
             var identity = request.HttpContext.User.Identity;
-            var authenticatedOrNot = identity.IsAuthenticated ? "authenticated" : "unauthenticated";
+            var status = identity.IsAuthenticated ? "authenticated" : "unauthenticated";
             var clientName = identity.IsAuthenticated ? identity.Name : "client";
-            await Connection.Send(connectionId, $"Received an {authenticatedOrNot} message from {clientName}: {data}");
+            await Connection.Send(connectionId, $"Received an {status} message from {clientName}: {data}");
         }
     }
 }

@@ -11,7 +11,7 @@ namespace HelloSignalR.Providers
         public override Task ValidateClientAuthentication(ValidateClientAuthenticationContext context)
         {
             context.Skipped();
-            return base.ValidateClientAuthentication(context);
+            return Task.FromResult(0);
         }
         public override Task GrantResourceOwnerCredentials(GrantResourceOwnerCredentialsContext context)
         {
@@ -19,7 +19,7 @@ namespace HelloSignalR.Providers
             if (context.UserName != user.UserName || context.Password != user.Password)
             {
                 context.Rejected("Invalid username or password.");
-                return Task.FromResult(Task.FromResult(true));
+                return Task.FromResult(0);
             }
 
             var identity = new ClaimsIdentity(OpenIdConnectDefaults.AuthenticationScheme);
@@ -29,7 +29,7 @@ namespace HelloSignalR.Providers
             var principal = new ClaimsPrincipal(identity);
             context.Validated(principal);
 
-            return Task.FromResult(Task.FromResult(true));
+            return Task.FromResult(0);
         }
     }
 }
