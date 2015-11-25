@@ -9,17 +9,17 @@
     <script type="text/javascript">
         'use strict';
         $(document).ready(function () {
-            let connectionBase = "http://localhost:5000";
-            let connectionPath = `${connectionBase}/signalr`;
+            var connectionBase = "http://localhost:5000";
+            var connectionPath = connectionBase + "/signalr";
 
-            let connectToSignalR = (token) => {
-                let connection = $.connection(connectionPath);
-                let log = data => console.log(data);
+            var connectToSignalR = function (token) {
+                var connection = $.connection(connectionPath);
+                var log = function (data) { console.log(data); }
 
-                connection.qs = `access_token=${token}`;
+                connection.qs = "access_token=" + token;
 
-                connection.received(data => {
-                    log(`From server: ${data}`);
+                connection.received(function (data) {
+                    log("From server: " + data);
                 });
 
                 connection.stateChanged(function (change) {
@@ -28,7 +28,7 @@
                             log('Re-connecting');
                             break;
                         case $.signalR.connectionState.connected:
-                            log(`Connected to ${connection.url}`);
+                            log("Connected to " + connection.url);
                             break;
                         case $.signalR.connectionState.disconnected:
                             log("Disconnected");
@@ -36,7 +36,7 @@
                     }
                 });
 
-                connection.start().done(() => {
+                connection.start().done(function () {
                     connection.send("Test message");
                 });
             };
@@ -44,10 +44,14 @@
 
             $.ajax({
                 type: "POST",
-                url: `${connectionBase}/connect/token`,
-                data: `client_id=AspNetContribSample&grant_type=password&username=AspNet&password=contrib&resource=${encodeURIComponent("http://localhost:5000/")}`,
+                url: connectionBase + "/connect/token",
+                data: "client_id=AspNetContribSample"
+                       + "&grant_type=password"
+                       + "&username=AspNet"
+                       + "&password=contrib"
+                       + "&resource=" + encodeURIComponent("http://localhost:5000/"),
                 contentType: "application/x-www-form-urlencoded"
-            }).then(data => {
+            }).then(function (data) {
                 connectToSignalR(data.access_token);
             });
 
