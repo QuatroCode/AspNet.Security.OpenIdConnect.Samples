@@ -38,14 +38,6 @@ namespace HelloSignalR
 
             var hostname = "http://localhost:5000/";
 
-            // Add token issuing middleware.
-            app.UseOpenIdConnectServer(config =>
-            {
-                // Your Auhentication server.
-                config.Provider = new AuthenticationProvider();
-                config.Issuer = new Uri(hostname);
-            });
-
             app.UseJwtBearerAuthentication(options =>
             {
                 // We need this to enable authentication for all requests.
@@ -65,8 +57,10 @@ namespace HelloSignalR
                     // Which can be as easy as adding it to query string
                     OnReceivingToken = context =>
                     {
-                        // If the token is not there, look at '?token={token}' query string value
-                        context.Token = context.Token ?? context.Request.Query["access_token"];
+                        // Set token to '?access_token={token}' query string value
+                        // If the token is not there, context.Request.Query["access_token"] will return null
+                        // And OIDC server will try to extract it from Headers["Authorization"]
+                        context.Token = context.Request.Query["access_token"];
                         return Task.FromResult(true);
                     }
                 };
@@ -94,6 +88,14 @@ namespace HelloSignalR
                      await context.Response.WriteAsync($"Username: {identity.Name}");
                  }
              });
+
+            // Add token issuing middleware.
+            app.UseOpenIdConnectServer(config =>
+            {
+                // Your Auhentication server.
+                config.Provider = new AuthenticationProvider();
+                config.Issuer = new Uri(hostname);
+            });
 
             // Configure the HTTP request pipeline for our front-end files.
             app.UseDefaultFiles();
