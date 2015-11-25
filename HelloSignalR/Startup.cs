@@ -66,6 +66,7 @@ namespace HelloSignalR
                     OnReceivingToken = context =>
                     {
                         // If the token is not there, look at '?token={token}' query string value
+                        context.Token = context.Token ?? context.Request.Query["access_token"];
                         return Task.FromResult(true);
                     }
                 };

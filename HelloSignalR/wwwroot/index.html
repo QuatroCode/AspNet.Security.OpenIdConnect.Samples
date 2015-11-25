@@ -16,7 +16,7 @@
                 let connection = $.connection(connectionPath);
                 let log = data => console.log(data);
 
-                connection.qs = `token=${token}`;
+                connection.qs = `access_token=${token}`;
 
                 connection.received(data => {
                     log(`From server: ${data}`);
