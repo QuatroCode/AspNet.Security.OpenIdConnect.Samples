@@ -9,8 +9,8 @@
     <script type="text/javascript">
         'use strict';
         $(document).ready(function () {
-            var connectionBase = "http://localhost:5005";
-            var connectionPath = connectionBase + "/signalr";
+            var connectionBase = "http://localhost:5005/";
+            var connectionPath = connectionBase + "signalr";
 
             var connectToSignalR = function (token) {
                 var connection = $.connection(connectionPath, "access_token=" + token);
