@@ -4,10 +4,14 @@ using AspNet.Security.OpenIdConnect.Extensions;
 using AspNet.Security.OpenIdConnect.Server;
 using Microsoft.AspNet.Authentication.OpenIdConnect;
 
-namespace HelloSignalR.Providers {
-    public class AuthenticationProvider : OpenIdConnectServerProvider {
-        public override Task ValidateClientAuthentication(ValidateClientAuthenticationContext context) {
-            if (context.ClientId == "AspNetContribSample") {
+namespace IdentityServer.Providers
+{
+    public class AuthenticationProvider : OpenIdConnectServerProvider
+    {
+        public override Task ValidateClientAuthentication(ValidateClientAuthenticationContext context)
+        {
+            if (context.ClientId == "AspNetContribSample")
+            {
                 // Note: the context is marked as skipped instead of validated because the client
                 // is not trusted (JavaScript applications cannot keep their credentials secret).
                 context.Skipped();
@@ -22,10 +26,16 @@ namespace HelloSignalR.Providers {
             return Task.FromResult(0);
         }
 
-        public override Task GrantResourceOwnerCredentials(GrantResourceOwnerCredentialsContext context) {
+        public override Task GrantResourceOwnerCredentials(GrantResourceOwnerCredentialsContext context)
+        {
+            context.HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" });
+            context.HttpContext.Response.Headers.Add("Access-Control-Allow-Methods", new[] { "*" });
+            context.HttpContext.Response.Headers.Add("Access-Control-Allow-Headers", new[] { "*" });
+
             var user = new { Id = "users-123", UserName = "AspNet", Password = "contrib" };
 
-            if (context.UserName != user.UserName || context.Password != user.Password) {
+            if (context.UserName != user.UserName || context.Password != user.Password)
+            {
                 context.Rejected("Invalid username or password.");
 
                 return Task.FromResult(0);
