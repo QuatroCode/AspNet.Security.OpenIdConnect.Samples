@@ -3,7 +3,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Extensions.Logging;
 
-namespace Client.Connections
+namespace SignalrResourceServer.Connections
 {
     public class SimpleConnection : PersistentConnection
     {

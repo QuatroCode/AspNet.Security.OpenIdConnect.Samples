@@ -1,13 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNet.Authentication.JwtBearer;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNet.Authentication.JwtBearer;
-using Client.Connections;
-using Microsoft.AspNet.Http;
+using SignalrResourceServer.Connections;
+using System.Threading.Tasks;
 
-namespace Client
+namespace SignalrResourceServer
 {
     public class Startup
     {
@@ -18,6 +17,7 @@ namespace Client
             services.AddAuthentication();
             services.AddCaching();
             services.AddSignalR();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,8 +33,13 @@ namespace Client
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            app.UseCors(config =>
+            {
+                config.AllowAnyOrigin();
+                config.AllowAnyHeader();
+                config.AllowAnyMethod();
+                config.AllowCredentials();
+            });
 
             // Add a new middleware validating access tokens.
             app.UseJwtBearerAuthentication(options =>
@@ -72,19 +77,6 @@ namespace Client
             app.UseWebSockets();
 
             app.UseSignalR<SimpleConnection>("/signalr");
-
-            app.Run(async context =>
-            {
-                var identity = context.User.Identity;
-                if (!identity.IsAuthenticated)
-                {
-                    await context.Response.WriteAsync("Not authenticated");
-                }
-                else
-                {
-                    await context.Response.WriteAsync($"Authenticated: {identity.Name}");
-                }
-            });
         }
 
         // Entry point for the application.
